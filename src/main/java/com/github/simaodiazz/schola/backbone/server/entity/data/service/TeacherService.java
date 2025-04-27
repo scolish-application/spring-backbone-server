@@ -54,13 +54,6 @@ public class TeacherService {
         teacherRepository.deleteById(id);
     }
 
-    public boolean isEmailUnique(String email) {
-        if (email == null || email.isEmpty()) {
-            return false;
-        }
-        return !teacherRepository.existsByEmail(email);
-    }
-
     public boolean isNifUnique(String nif) {
         if (nif == null || nif.isEmpty()) {
             return false;

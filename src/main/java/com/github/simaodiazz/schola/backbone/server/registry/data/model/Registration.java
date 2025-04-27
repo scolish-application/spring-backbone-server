@@ -17,6 +17,8 @@ import org.springframework.data.redis.core.RedisHash;
 @Data
 public final class Registration extends EntitySuperclass {
 
+    private long id;
+
     @Enumerated(EnumType.STRING)
     private RegistrationDirection direction;
 

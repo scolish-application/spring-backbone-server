@@ -48,10 +48,6 @@ public class RegistrationService {
         return registrationRepository.findByDirection(direction);
     }
 
-    public List<Registration> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end) {
-        return registrationRepository.findByCreatedAtBetween(start, end);
-    }
-
     public void deleteRegistration(Long id) {
         registrationRepository.deleteById(id);
     }

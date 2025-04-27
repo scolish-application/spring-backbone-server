@@ -49,7 +49,6 @@ public class CourierService {
         return user(id);
     }
 
-    @CachePut(value = "couriers", key = "#user.id")
     @Transactional
     public Courier save(User user) {
         Courier courier = new Courier(user);

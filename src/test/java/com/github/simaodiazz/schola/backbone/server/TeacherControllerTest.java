@@ -290,21 +290,6 @@ public class TeacherControllerTest {
         verify(teacherService, times(1)).isNifUnique("123456789");
     }
 
-    @Test
-    void checkEmailUniqueness_ShouldReturnResult() throws Exception {
-        // Arrange
-        when(teacherService.isEmailUnique("email@example.com")).thenReturn(true);
-
-        // Act & Assert
-        mockMvc.perform(get("/api/teachers/check-email")
-                        .param("email", "email@example.com")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string("true"));
-
-        verify(teacherService, times(1)).isEmailUnique("email@example.com");
-    }
-
     private Teacher createSampleTeacher() {
         Teacher teacher = new Teacher();
         teacher.setId(1L);

@@ -4,6 +4,7 @@ import com.github.simaodiazz.schola.backbone.server.entity.data.model.Teacher;
 import com.github.simaodiazz.schola.backbone.server.entity.data.service.TeacherService;
 import com.github.simaodiazz.schola.backbone.server.router.controller.dto.TeacherRequest;
 import com.github.simaodiazz.schola.backbone.server.security.data.model.User;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -118,13 +119,7 @@ public class TeacherController {
         return ResponseEntity.ok(teacherService.isNifUnique(nif));
     }
 
-    @GetMapping("/check-email")
-    public ResponseEntity<Boolean> checkEmailUniqueness(@RequestParam String email) {
-        return ResponseEntity.ok(teacherService.isEmailUnique(email));
-    }
-
-    // Helper methods to map between entity and DTO
-    private TeacherRequest mapToResponse(Teacher teacher) {
+    private @NotNull TeacherRequest mapToResponse(@NotNull Teacher teacher) {
         TeacherRequest response = new TeacherRequest();
         response.setName(teacher.getName());
         response.setNif(teacher.getNif());
@@ -133,7 +128,7 @@ public class TeacherController {
         return response;
     }
 
-    private Teacher mapToEntity(TeacherRequest request) {
+    private @NotNull Teacher mapToEntity(@NotNull TeacherRequest request) {
         Teacher teacher = new Teacher();
         teacher.setName(request.getName());
         teacher.setNif(request.getNif());

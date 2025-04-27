@@ -26,10 +26,8 @@ public class RegistrationMapper {
         }
 
         return RegistrationRequest.builder()
-                .id(registration.getId())
                 .direction(registration.getDirection())
                 .userId(registration.getUser().getId())
-                .createdAt(registration.getCreated())
                 .build();
     }
 
@@ -39,10 +37,7 @@ public class RegistrationMapper {
         }
 
         Registration registration = new Registration();
-        registration.setId(registrationDTO.getId());
         registration.setDirection(registrationDTO.getDirection());
-
-        userDataService.id(registrationDTO.getId()).ifPresent(registration::setUser);
 
         return registration;
     }

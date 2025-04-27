@@ -12,15 +12,11 @@ import java.util.Optional;
 @Repository
 public interface TeacherRepository extends JpaRepository<Teacher, Long> {
 
-    Optional<Teacher> findByEmail(String email);
-
     Optional<Teacher> findByNif(String nif);
 
     Optional<Teacher> findByUserId(Long userId);
 
     List<Teacher> findByName(String name);
-
-    boolean existsByEmail(String email);
 
     boolean existsByNif(String nif);
 

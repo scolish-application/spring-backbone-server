@@ -390,7 +390,6 @@ public class RegistrationControllerTest {
                 .id(1L)
                 .direction(RegistrationDirection.ENTRY)
                 .userId(createTestUser().getId())
-                .createdAt(LocalDateTime.now())
                 .build();
     }
 

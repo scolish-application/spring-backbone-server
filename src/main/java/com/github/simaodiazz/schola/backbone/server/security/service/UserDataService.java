@@ -5,6 +5,7 @@ import com.github.simaodiazz.schola.backbone.server.security.data.repository.Use
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,4 +28,13 @@ public class UserDataService {
     public @NotNull Optional<User> username(final @NotNull String username) {
         return repository.findByUsername(username);
     }
+
+    public Iterable<User> findAll() {
+        return repository.findAll();
+    }
+
+    public void delete(final long id) {
+        repository.deleteById(id);
+    }
+
 }

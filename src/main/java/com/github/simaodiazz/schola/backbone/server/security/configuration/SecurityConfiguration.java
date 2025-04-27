@@ -47,6 +47,9 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests((mail) ->
                         mail
                                 .requestMatchers("/api/mail/**").authenticated())
+                .authorizeHttpRequests((users) ->
+                        users
+                                .requestMatchers("/api/user/**").permitAll())
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(logout -> logout.deleteCookies("JSESSIONID"))
                 .authenticationProvider(authenticationProvider)

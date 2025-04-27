@@ -9,6 +9,7 @@ import com.github.simaodiazz.schola.backbone.server.router.controller.dto.Regist
 import com.github.simaodiazz.schola.backbone.server.router.controller.mapper.CarteMapper;
 import com.github.simaodiazz.schola.backbone.server.router.controller.mapper.RegistrationMapper;
 import jakarta.validation.Valid;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -85,9 +86,8 @@ public class RegistrationController {
         return ResponseEntity.noContent().build();
     }
 
-    // Carte endpoints
     @PostMapping("/carte")
-    public ResponseEntity<CarteRequest> createCarte(@Valid @RequestBody CarteRequest carteDTO) {
+    public ResponseEntity<CarteRequest> createCarte(@Valid @RequestBody @NotNull CarteRequest carteDTO) {
         if (carteService.existsByCode(carteDTO.getCode())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Carte already exists with code: " + carteDTO.getCode());
         }

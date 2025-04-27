@@ -84,13 +84,6 @@ public class EstudianteService {
         return !estudianteRepository.existsByNif(nif);
     }
 
-    public boolean isEmailUnique(String email) {
-        if (email == null || email.isEmpty()) {
-            return false;
-        }
-        return !estudianteRepository.existsByEmail(email);
-    }
-
     @Cacheable(value = "studentByUserId", key = "#userId")
     public Optional<Estudiante> getStudentByUserId(Long userId) {
         return estudianteRepository.findByUserId(userId);
