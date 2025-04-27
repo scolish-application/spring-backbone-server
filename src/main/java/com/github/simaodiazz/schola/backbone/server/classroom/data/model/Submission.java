@@ -20,6 +20,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Submission extends EntitySuperclass {
 
+    @Column
+    @NotNull
+    private String title;
+
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "work_id", nullable = false)

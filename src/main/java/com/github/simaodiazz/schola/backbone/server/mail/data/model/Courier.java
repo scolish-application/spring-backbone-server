@@ -4,7 +4,6 @@ import com.github.simaodiazz.schola.backbone.server.database.entity.EntitySuperc
 import com.github.simaodiazz.schola.backbone.server.security.data.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import org.jetbrains.annotations.UnmodifiableView;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.util.ArrayList;
@@ -19,12 +18,16 @@ public final class Courier extends EntitySuperclass {
     private User user;
 
     @OneToMany(mappedBy = "author")
-    private List<@NotNull Message> sent;
+    private List<Message> sent;
 
-    @ManyToMany(mappedBy = "couriers")
-    private List<@NotNull Message> received;
+    @ManyToMany
+    @JoinTable(
+            name = "courier_received_messages",
+            joinColumns = @JoinColumn(name = "courier_id"),
+            inverseJoinColumns = @JoinColumn(name = "message_id"))
+    private List<Message> received;
 
-    private Courier() {
+    public Courier() {
         this.sent = new ArrayList<>();
         this.received = new ArrayList<>();
     }
@@ -35,13 +38,13 @@ public final class Courier extends EntitySuperclass {
         this.received = new ArrayList<>();
     }
 
-    public Courier(final @NotNull User user, final @NotNull @UnmodifiableView List<@NotNull Message> sent) {
+    public Courier(final @NotNull User user, final @NotNull List<Message> sent) {
         this.user = user;
         this.sent = sent;
         this.received = new ArrayList<>();
     }
 
-    public Courier(final long id, final @NotNull User user, final @NotNull @UnmodifiableView List<@NotNull Message> sent) {
+    public Courier(final long id, final @NotNull User user, final @NotNull List<Message> sent) {
         super(id);
         this.user = user;
         this.sent = sent;
@@ -52,7 +55,7 @@ public final class Courier extends EntitySuperclass {
         return user;
     }
 
-    public @NotNull List<@NotNull Message> getSent() {
+    public @NotNull List<Message> getSent() {
         return sent;
     }
 

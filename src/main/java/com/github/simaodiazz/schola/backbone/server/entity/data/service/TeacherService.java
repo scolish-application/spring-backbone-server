@@ -28,11 +28,6 @@ public class TeacherService {
         return teacherRepository.findById(id);
     }
 
-    @Cacheable(value = "teachersByEmail", key = "#email")
-    public Optional<Teacher> getTeacherByEmail(String email) {
-        return teacherRepository.findByEmail(email);
-    }
-
     @Cacheable(value = "teachersByNif", key = "#nif")
     public Optional<Teacher> getTeacherByNif(String nif) {
         return teacherRepository.findByNif(nif);
@@ -43,14 +38,9 @@ public class TeacherService {
         return teacherRepository.findByUserId(userId);
     }
 
-    @Cacheable(value = "teachersByLastName", key = "#lastName")
-    public List<Teacher> getTeachersByLastName(String lastName) {
-        return teacherRepository.findByLastName(lastName);
-    }
-
     @Cacheable(value = "searchTeachers", key = "#name")
-    public List<Teacher> searchTeachersByName(String name) {
-        return teacherRepository.searchByName(name);
+    public List<Teacher> getTeacherByName(String name) {
+        return teacherRepository.findByName(name);
     }
 
     @CachePut(value = "teachers", key = "#result.id")

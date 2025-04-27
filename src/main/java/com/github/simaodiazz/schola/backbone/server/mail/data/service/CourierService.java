@@ -17,7 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class CourierService {
@@ -37,8 +39,8 @@ public class CourierService {
     }
 
     @Cacheable(value = "couriers", key = "#userId")
-    public @Nullable Courier user(final long id) {
-        return courierRepository.findByUserId(id).orElse(null);
+    public @Nullable Courier user(final long userId) {
+        return courierRepository.findByUserId(userId).orElse(null);
     }
 
     @Cacheable(value = "couriers", key = "#user.id")
@@ -49,9 +51,9 @@ public class CourierService {
 
     @CachePut(value = "couriers", key = "#user.id")
     @Transactional
-    public void save(User user) {
+    public Courier save(User user) {
         Courier courier = new Courier(user);
-        courierRepository.save(courier);
+        return courierRepository.save(courier);
     }
 
     @Cacheable(value = "allCouriers")
@@ -72,13 +74,13 @@ public class CourierService {
     }
 
     @Cacheable(value = "sentMessages", key = "#courierId + '_' + #pageable.pageNumber + '_' + #pageable.pageSize")
-    public Page<Message> sent(Long id, Pageable pageable) {
-        return messageRepository.findByAuthorId(id, pageable);
+    public Page<Message> sent(Long courierId, Pageable pageable) {
+        return messageRepository.findByAuthorId(courierId, pageable);
     }
 
     @Cacheable(value = "receivedMessages", key = "#courierId + '_' + #pageable.pageNumber + '_' + #pageable.pageSize")
-    public Page<Message> received(Long id, Pageable pageable) {
-        return messageRepository.findByCourierId(id, pageable);
+    public Page<Message> received(Long courierId, Pageable pageable) {
+        return messageRepository.findByCourierId(courierId, pageable);
     }
 
     @Cacheable(value = "messagesByKeyword", key = "#keyword + '_' + #pageable.pageNumber + '_' + #pageable.pageSize")
@@ -95,8 +97,33 @@ public class CourierService {
             }
     )
     @Transactional
-    public Message sendMessage(String content, Courier author, List<Courier> recipients) {
-        Message message = new Message(content, author, recipients);
+    public Message sendMessage(String content, Courier author, Set<User> targetUsers) {
+        // Create the message
+        Message message = new Message();
+        message.setContent(content);
+        message.setAuthor(author);
+
+        // Save the message first to get an ID
+        message = messageRepository.save(message);
+
+        // Find/create couriers for target users
+        Set<Courier> targetCouriers = targetUsers.stream()
+                .map(user -> user(user) != null ? user(user) : save(user))
+                .collect(Collectors.toSet());
+
+        // Add the message to each courier's received messages
+        for (Courier targetCourier : targetCouriers) {
+            targetCourier.getReceived().add(message);
+            courierRepository.save(targetCourier);
+        }
+
+        // Update the message with the target couriers
+        message.setCouriers(new HashSet<>(targetCouriers));
+
+        // Add the message to the author's sent messages
+        author.getSent().add(message);
+        courierRepository.save(author);
+
         return messageRepository.save(message);
     }
 

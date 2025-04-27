@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 @Component
@@ -41,6 +42,6 @@ public class CalendarNotificationSchedule {
     private void executeAction(final @NotNull Eventus eventus) {
         final User user = eventus.getUser();
         final Courier courier = courierService.user(user);
-        courierService.sendMessage(eventus.getName() + " está prestes a acabar.", courier, Collections.singletonList(courier));
+        courierService.sendMessage(eventus.getName() + " está prestes a acabar.", courier, Collections.singleton(user));
     }
 }

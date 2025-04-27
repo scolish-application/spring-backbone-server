@@ -34,9 +34,6 @@ public class Guardian {
     @Column(nullable = false)
     private String nif;
 
-    @Email(message = "Email inválido")
-    private String email;
-
     @Pattern(regexp = "^[0-9]{9}$", message = "O número de telefone deve conter 9 dígitos")
     @Column(nullable = false)
     private String phone;

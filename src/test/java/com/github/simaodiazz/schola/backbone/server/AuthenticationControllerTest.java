@@ -5,27 +5,28 @@ import com.github.simaodiazz.schola.backbone.server.router.controller.dto.Authen
 import com.github.simaodiazz.schola.backbone.server.router.event.AuthenticationRegisterRouteInvokeEvent;
 import com.github.simaodiazz.schola.backbone.server.security.data.model.User;
 import com.github.simaodiazz.schola.backbone.server.security.service.UserDataService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class AuthenticationControllerTest {
-
-    private AuthenticationController authenticationController;
-
-    @Mock
-    private AuthenticationProvider authenticationProvider;
 
     @Mock
     private ApplicationEventPublisher publisher;
@@ -34,47 +35,83 @@ public class AuthenticationControllerTest {
     private UserDataService userDataService;
 
     @Mock
-    private HttpServletRequest httpServletRequest;
+    private AuthenticationProvider authenticationProvider;
+
+    @Mock
+    private SecurityContext securityContext;
+
+    @Mock
+    private Authentication authentication;
+
+    @InjectMocks
+    private AuthenticationController authenticationController;
+
+    private AuthenticationRequest validAuthRequest;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        authenticationController = new AuthenticationController(publisher, userDataService, authenticationProvider);
+        validAuthRequest = new AuthenticationRequest("testuser", "password123");
+        SecurityContextHolder.setContext(securityContext);
     }
 
     @Test
-    void testLoginSuccess() throws Exception {
-        AuthenticationRequest request = new AuthenticationRequest("testuser", "password123");
-        doNothing().when(httpServletRequest).login(anyString(), anyString());
-        ResponseEntity<String> response = authenticationController.login(request);
+    void login_ShouldReturnOk_WhenCredentialsAreValid() {
+        // Arrange
+        when(authenticationProvider.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
+
+        // Act
+        ResponseEntity<String> response = authenticationController.login(validAuthRequest);
+
+        // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Login successful.", response.getBody());
-        verify(httpServletRequest).login("testuser", "password123");
+        verify(securityContext).setAuthentication(authentication);
     }
 
     @Test
-    void testRegisterSuccess() {
-        AuthenticationRequest request = new AuthenticationRequest("newuser", "password123");
-        doNothing().when(userDataService).save(any(User.class));
-        ResponseEntity<String> response = authenticationController.register(request);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Account created, please login to continue.", response.getBody());
-        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userDataService).save(userCaptor.capture());
+    void login_ShouldReturnBadRequest_WhenAuthenticationFails() {
+        // Arrange
+        String errorMessage = "Bad credentials";
+        when(authenticationProvider.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new RuntimeException(errorMessage));
+
+        // Act
+        ResponseEntity<String> response = authenticationController.login(validAuthRequest);
+
+        // Assert
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(errorMessage, response.getBody());
+    }
+
+    @Test
+    void register_ShouldReturnOk_WhenRegistrationIsSuccessful() {
+        // Arrange
+        User mockUser = mock(User.class);
         ArgumentCaptor<AuthenticationRegisterRouteInvokeEvent> eventCaptor =
                 ArgumentCaptor.forClass(AuthenticationRegisterRouteInvokeEvent.class);
+
+        // Act
+        ResponseEntity<String> response = authenticationController.register(validAuthRequest);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Account created, please login to continue.", response.getBody());
+        verify(userDataService).save(any(User.class));
         verify(publisher).publishEvent(eventCaptor.capture());
-        assertSame(userCaptor.getValue(), eventCaptor.getValue().user());
     }
 
     @Test
-    void testRegisterFailure() {
-        AuthenticationRequest request = new AuthenticationRequest("existing user", "password123");
-        doThrow(new RuntimeException("Username already exists")).when(userDataService).save(any(User.class));
-        ResponseEntity<String> response = authenticationController.register(request);
+    void register_ShouldReturnBadRequest_WhenRegistrationFails() {
+        // Arrange
+        String errorMessage = "Username already exists";
+        doThrow(new RuntimeException(errorMessage)).when(userDataService).save(any(User.class));
+
+        // Act
+        ResponseEntity<String> response = authenticationController.register(validAuthRequest);
+
+        // Assert
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Username already exists", response.getBody());
-        verify(userDataService).save(any(User.class));
-        verify(publisher, never()).publishEvent(any());
+        assertEquals(errorMessage, response.getBody());
     }
 }

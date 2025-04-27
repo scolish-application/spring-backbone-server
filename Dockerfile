@@ -1,4 +1,5 @@
-FROM ubuntu:latest
-LABEL authors="simaodiazz"
+FROM gradle:8.13-jdk-21-and-23-alpine AS builder
 
-ENTRYPOINT ["top", "-b"]
+WORKDIR /usr/app
+
+COPY . .

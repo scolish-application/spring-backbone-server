@@ -20,7 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -60,6 +61,11 @@ public class CourierController {
 
         final User user = getCurrentUser();
         final Courier courier = courierService.user(user);
+
+        if (courier == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         final long id = courier.getId();
 
         Pageable pageable = createPageable(page, size, sortBy, direction);
@@ -87,6 +93,11 @@ public class CourierController {
 
         final User user = getCurrentUser();
         final Courier courier = courierService.user(user);
+
+        if (courier == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         final long id = courier.getId();
 
         Pageable pageable = createPageable(page, size, sortBy, direction);
@@ -106,7 +117,6 @@ public class CourierController {
     }
 
     @GetMapping("/messages/{id}")
-    @SuppressWarnings("all")
     public ResponseEntity<Message> getMessage(@PathVariable Long id) {
         Message message = courierService.message(id);
         if (message == null)
@@ -115,7 +125,11 @@ public class CourierController {
         final User user = getCurrentUser();
         final Courier courier = courierService.user(user);
 
-        boolean isAuthor = message.getAuthor().getId() == user.getId();
+        if (courier == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        boolean isAuthor = message.getAuthor().getId() == courier.getId();
         boolean isRecipient = message.getCouriers().stream()
                 .anyMatch(c -> c.getId() == courier.getId());
 
@@ -128,21 +142,33 @@ public class CourierController {
     @PostMapping("/send")
     public ResponseEntity<Message> sendMessage(@RequestBody @NotNull MessageRequest request) {
         final User user = getCurrentUser();
-        final Courier courier = courierService.user(user);
+        Courier courier = courierService.user(user);
 
-        List<Courier> recipients = request.recipients().stream()
-                .map(courierService::courier)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        if (courier == null) {
+            // Create a courier for the user if it doesn't exist
+            courierService.save(user);
+            courier = courierService.user(user);
 
-        if (recipients.isEmpty()) {
+            if (courier == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(null);
+            }
+        }
+
+        Set<User> targets = request.targets().stream()
+                .map(userService::id)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+
+        if (targets.isEmpty()) {
             return ResponseEntity.badRequest().body(null);
         }
 
         Message message = courierService.sendMessage(
                 request.content(),
                 courier,
-                recipients
+                targets
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(message);
@@ -157,6 +183,10 @@ public class CourierController {
 
         final User user = getCurrentUser();
         final Courier courier = courierService.user(user);
+
+        if (courier == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         if (message.getAuthor().getId() == courier.getId()) {
             courierService.deleteMessage(id);
@@ -174,13 +204,17 @@ public class CourierController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String direction) {
 
-        Pageable pageable = createPageable(page, size, sortBy, direction);
-        Page<Message> messagePage = courierService.searchMessages(keyword, pageable);
-
         final User user = getCurrentUser();
         final Courier courier = courierService.user(user);
 
-        long courierId = courier.getId();
+        if (courier == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        final long courierId = courier.getId();
+
+        Pageable pageable = createPageable(page, size, sortBy, direction);
+        Page<Message> messagePage = courierService.searchMessages(keyword, pageable);
 
         List<Message> filteredContent = messagePage.getContent().stream()
                 .filter(message -> {
@@ -198,8 +232,8 @@ public class CourierController {
                 filteredContent,
                 messagePage.getNumber(),
                 messagePage.getSize(),
-                messagePage.getTotalElements(), // This would be inaccurate after filtering
-                messagePage.getTotalPages(),    // This would be inaccurate after filtering
+                filteredContent.size(), // More accurate count after filtering
+                (int) Math.ceil((double) filteredContent.size() / messagePage.getSize()), // More accurate page count
                 messagePage.isFirst(),
                 messagePage.isLast()
         );

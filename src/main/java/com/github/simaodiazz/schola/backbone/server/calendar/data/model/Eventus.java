@@ -46,4 +46,12 @@ public final class Eventus extends EntitySuperclass {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
+    public Eventus(long id, LocalDateTime created, LocalDateTime updated, String name, String description, LocalDateTime start, LocalDateTime end, User user) {
+        super(id, created, updated);
+        this.name = name;
+        this.description = description;
+        this.start = start;
+        this.end = end;
+        this.user = user;
+    }
 }

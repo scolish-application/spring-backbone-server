@@ -22,16 +22,7 @@ public class Teacher extends EntitySuperclass {
 
     @NotBlank
     @Column(nullable = false)
-    private String firstName;
-
-    @NotBlank
-    @Column(nullable = false)
-    private String lastName;
-
-    @Email
-    @NotBlank
-    @Column(nullable = false, unique = true)
-    private String email;
+    private String name;
 
     @NotBlank
     @Column(nullable = false, unique = true)
