@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: schola-backbone-server
+  datasource:
+    url: jdbc:mariadb://localhost:3307/db
+    username: root
+    password: root
+  redis:
+    password: root
+  data:
+    redis:
+      repositories:
+        enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: update
+  security:
+    user:
+      name: admin
+      password: admin

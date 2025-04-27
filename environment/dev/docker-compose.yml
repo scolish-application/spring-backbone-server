@@ -1,0 +1,29 @@
+services:
+  maria:
+    image: mariadb
+    container_name: maria
+    ports:
+      - '3307:3306'
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - generic_network
+    restart: unless-stopped
+    pull_policy: missing
+  redis:
+    image: redis
+    container_name: redis
+    environment:
+      - REDIS_PASSWORD=root
+    cap_add:
+      - IPC_LOCK
+    ports:
+      - '6379:6379'
+    networks:
+      - generic_network
+    restart: unless-stopped
+    pull_policy: missing
+
+networks:
+  generic_network:
+    driver: bridge
