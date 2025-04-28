@@ -1,5 +1,6 @@
 package com.github.simaodiazz.schola.backbone.server.entity.data.model;
 
+import com.github.simaodiazz.schola.backbone.server.classroom.data.model.Classroom;
 import com.github.simaodiazz.schola.backbone.server.security.data.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -53,18 +54,14 @@ public class Estudiante {
     @JoinColumn(name = "student_id")
     private List<Guardian> guardians = new ArrayList<>();
 
-    @Column(nullable = false)
-    private String schoolClass;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(
+            name = "classroom_id",
+            referencedColumnName = "id")
+    private Classroom classroom;
 
     @Column
-    private String emergencyContactName;
-
-    @Column
-    @Pattern(regexp = "^[0-9]{9}$", message = "O número de emergência deve conter 9 dígitos")
-    private String emergencyContactPhone;
-
-    @Column
-    private boolean specialNeeds;
+    private boolean special;
 
     @Column
     private String medicalInformation;

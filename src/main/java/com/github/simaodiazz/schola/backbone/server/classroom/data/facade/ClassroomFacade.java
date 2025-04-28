@@ -5,7 +5,6 @@ import com.github.simaodiazz.schola.backbone.server.classroom.data.service.*;
 import com.github.simaodiazz.schola.backbone.server.course.data.model.Discipline;
 import com.github.simaodiazz.schola.backbone.server.entity.data.model.Estudiante;
 import com.github.simaodiazz.schola.backbone.server.router.controller.dto.PerformanceResponse;
-import com.github.simaodiazz.schola.backbone.server.router.controller.dto.SummaryResponse;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
@@ -104,10 +103,6 @@ public class ClassroomFacade {
 
     public List<Activity> getActivitiesBySemester(Semester semester) {
         return activityService.findBySemester(semester);
-    }
-
-    public List<Activity> getActivitiesByDisciplineAndSemester(Discipline discipline, Semester semester) {
-        return activityService.findByDisciplineAndSemester(discipline, semester);
     }
 
     public Activity saveActivity(Activity activity) {
@@ -240,16 +235,5 @@ public class ClassroomFacade {
                 .toList();
 
         return new PerformanceResponse(studentId, semesterId, semesterAverage, semesterResults);
-    }
-
-    public SummaryResponse getClassroomSummary(final long classroomId) {
-        Classroom classroom = classroomService.getClassroomById(classroomId);
-        List<Activity> activities = activityService.findByDisciplineAndSemester(
-                classroom.getDiscipline(), classroom.getSemester());
-        List<Lesson> lessons = lessonService.getLessonsByClassroom(classroom);
-        List<Evaluation> evaluations = evaluationService.findBySemesterIdAndDisciplineId(
-                classroom.getSemester().getId(), classroom.getDiscipline().getId());
-
-        return new SummaryResponse(classroom, activities, lessons, evaluations);
     }
 }

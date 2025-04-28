@@ -39,8 +39,8 @@ public class EstudianteService {
     }
 
     @Cacheable(value = "studentsByClass", key = "#schoolClass")
-    public List<Estudiante> getStudentsBySchoolClass(String schoolClass) {
-        return estudianteRepository.findBySchoolClass(schoolClass);
+    public List<Estudiante> getStudentsBySchoolClass(final long classroomId) {
+        return estudianteRepository.findByClassroomId(classroomId);
     }
 
     @Cacheable(value = "studentsByName", key = "#name")

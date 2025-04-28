@@ -39,15 +39,9 @@ public class EstudianteRequest {
     @Valid
     private List<GuardianRequest> guardians = new ArrayList<>();
 
-    @NotBlank(message = "A turma é obrigatória")
-    private String schoolClass;
+    private long classroomId;
 
-    private String emergencyContactName;
-
-    @Pattern(regexp = "^[0-9]{9}$", message = "O número de emergência deve conter 9 dígitos")
-    private String emergencyContactPhone;
-
-    private boolean specialNeeds;
+    private boolean special;
 
     private String medicalInformation;
 

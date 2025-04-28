@@ -2,7 +2,6 @@ package com.github.simaodiazz.schola.backbone.server.router.controller;
 
 import com.github.simaodiazz.schola.backbone.server.classroom.data.facade.ClassroomFacade;
 import com.github.simaodiazz.schola.backbone.server.router.controller.dto.PerformanceResponse;
-import com.github.simaodiazz.schola.backbone.server.router.controller.dto.SummaryResponse;
 import com.github.simaodiazz.schola.backbone.server.classroom.data.model.*;
 import com.github.simaodiazz.schola.backbone.server.course.data.model.Discipline;
 import com.github.simaodiazz.schola.backbone.server.entity.data.model.Estudiante;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -143,21 +141,6 @@ public class ClassroomController {
         return classroomFacade.getSemester(semesterId)
                 .map(semester -> ResponseEntity.ok(classroomFacade.getActivitiesBySemester(semester)))
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/activities/discipline/{disciplineId}/semester/{semesterId}")
-    public ResponseEntity<List<Activity>> getActivitiesByDisciplineAndSemester(
-            @PathVariable long disciplineId,
-            @PathVariable long semesterId) {
-        Optional<Semester> semester = classroomFacade.getSemester(semesterId);
-        if (semester.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Discipline discipline = new Discipline();
-        discipline.setId(disciplineId);
-
-        return ResponseEntity.ok(classroomFacade.getActivitiesByDisciplineAndSemester(discipline, semester.get()));
     }
 
     @PostMapping("/activities")
@@ -377,14 +360,5 @@ public class ClassroomController {
             @PathVariable long studentId,
             @PathVariable long semesterId) {
         return ResponseEntity.ok(classroomFacade.getStudentPerformanceSummary(studentId, semesterId));
-    }
-
-    @GetMapping("/classrooms/{id}/summary")
-    public ResponseEntity<SummaryResponse> getClassroomSummary(@PathVariable long id) {
-        try {
-            return ResponseEntity.ok(classroomFacade.getClassroomSummary(id));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
     }
 }

@@ -64,11 +64,6 @@ public class ActivityService {
         return activityRepository.findBySemester(semester);
     }
 
-    @Cacheable(value = "activities", key = "'discipline-semester-' + #discipline.id + '-' + #semester.id")
-    public List<Activity> findByDisciplineAndSemester(Discipline discipline, Semester semester) {
-        return activityRepository.findByDisciplineAndSemester(discipline, semester);
-    }
-
     public List<Activity> findByDueDateBefore(LocalDateTime date) {
         return activityRepository.findByDueDateBefore(date);
     }

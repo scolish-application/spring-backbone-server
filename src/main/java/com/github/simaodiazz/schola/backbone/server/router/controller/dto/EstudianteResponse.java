@@ -23,10 +23,8 @@ public class EstudianteResponse {
     private Gender gender;
     private AddressResponse address;
     private List<GuardianResponse> guardians = new ArrayList<>();
-    private String schoolClass;
-    private String emergencyContactName;
-    private String emergencyContactPhone;
-    private boolean specialNeeds;
+    private long classroomId;
+    private boolean special;
     private String medicalInformation;
     private Long userId;
 

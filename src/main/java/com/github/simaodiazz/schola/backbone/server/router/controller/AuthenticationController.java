@@ -7,15 +7,14 @@ import com.github.simaodiazz.schola.backbone.server.security.data.model.builder.
 import com.github.simaodiazz.schola.backbone.server.security.service.UserDataService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/authentication")
@@ -64,6 +63,21 @@ public class AuthenticationController {
             return ResponseEntity.ok("Account created, please login to continue.");
         } catch (Exception e) {
             final String message = e.getMessage();
+            return ResponseEntity.badRequest().body(message);
+        }
+    }
+
+    @GetMapping("/hasAuthority/admin/{username}")
+    public ResponseEntity<?> isAdmin(final @PathVariable(name = "username") String username) {
+        try {
+            final boolean isAdmin = userDataService.username(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User with that id is not founded"))
+                    .getAuthorities()
+                    .stream()
+                    .anyMatch(authority -> authority.getAuthority().equalsIgnoreCase("ROLE_ADMIN"));
+            return isAdmin ? ResponseEntity.ok(true) : ResponseEntity.status(401).body(false);
+        } catch (Exception exception) {
+            final String message = exception.getMessage();
             return ResponseEntity.badRequest().body(message);
         }
     }

@@ -58,9 +58,8 @@ public class ClassroomService {
         existingClassroom.setCapacity(updatedClassroom.getCapacity());
         existingClassroom.setType(updatedClassroom.getType());
 
-        // Update relationships if provided
-        if (updatedClassroom.getDiscipline() != null) {
-            existingClassroom.setDiscipline(updatedClassroom.getDiscipline());
+        if (updatedClassroom.getDisciplines() != null) {
+            existingClassroom.setDisciplines(updatedClassroom.getDisciplines());
         }
 
         if (updatedClassroom.getSemester() != null) {
@@ -81,7 +80,13 @@ public class ClassroomService {
 
     @Transactional(readOnly = true)
     public List<Classroom> getClassroomsByDiscipline(Discipline discipline) {
-        return classroomRepository.findByDiscipline(discipline);
+        return classroomRepository.findByDisciplineId(
+                discipline.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Classroom> getClassroomsByDiscipline(final long id) {
+        return classroomRepository.findByDisciplineId(id);
     }
 
     @Transactional(readOnly = true)
@@ -146,7 +151,7 @@ public class ClassroomService {
             throw new IllegalArgumentException("Classroom name cannot be empty");
         }
 
-        if (classroom.getDiscipline() == null) {
+        if (classroom.getDisciplines() == null || classroom.getDisciplines().isEmpty()) {
             throw new IllegalArgumentException("Classroom must be associated with a discipline");
         }
 

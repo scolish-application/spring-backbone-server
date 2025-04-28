@@ -14,7 +14,7 @@ public interface EstudianteRepository extends JpaRepository<Estudiante, Long> {
 
     Optional<Estudiante> findByNif(String nif);
 
-    List<Estudiante> findBySchoolClass(String schoolClass);
+    List<Estudiante> findByClassroomId(long classroomId);
 
     @Query("SELECT s FROM Estudiante s WHERE LOWER(s.name) LIKE LOWER(CONCAT('%', :name, '%')) OR LOWER(s.name) LIKE LOWER(CONCAT('%', :name, '%'))")
     List<Estudiante> searchByName(@Param("name") String name);

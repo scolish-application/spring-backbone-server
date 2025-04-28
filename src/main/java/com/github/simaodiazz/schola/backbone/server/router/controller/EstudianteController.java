@@ -1,5 +1,6 @@
 package com.github.simaodiazz.schola.backbone.server.router.controller;
 
+import com.github.simaodiazz.schola.backbone.server.classroom.data.service.ClassroomService;
 import com.github.simaodiazz.schola.backbone.server.entity.data.model.Address;
 import com.github.simaodiazz.schola.backbone.server.entity.data.model.Estudiante;
 import com.github.simaodiazz.schola.backbone.server.entity.data.model.Guardian;
@@ -22,10 +23,11 @@ import java.util.stream.Collectors;
 public class EstudianteController {
 
     private final EstudianteService estudianteService;
+    private final ClassroomService classroomService;
 
-    @Autowired
-    public EstudianteController(EstudianteService estudianteService) {
+    public EstudianteController(EstudianteService estudianteService, ClassroomService classroomService) {
         this.estudianteService = estudianteService;
+        this.classroomService = classroomService;
     }
 
     @GetMapping
@@ -54,8 +56,8 @@ public class EstudianteController {
     }
 
     @GetMapping("/class/{schoolClass}")
-    public ResponseEntity<List<EstudianteResponse>> getStudentsByClass(@PathVariable String schoolClass) {
-        List<Estudiante> estudiantes = estudianteService.getStudentsBySchoolClass(schoolClass);
+    public ResponseEntity<List<EstudianteResponse>> getStudentsByClass(@PathVariable long classroomId) {
+        List<Estudiante> estudiantes = estudianteService.getStudentsBySchoolClass(classroomId);
         List<EstudianteResponse> response = estudiantes.stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
@@ -99,7 +101,6 @@ public class EstudianteController {
 
     @PostMapping
     public ResponseEntity<EstudianteResponse> createStudent(@Valid @RequestBody EstudianteRequest request) {
-        // Verificar se o NIF já existe
         if (!estudianteService.isNifUnique(request.getNif())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "NIF já cadastrado no sistema");
         }
@@ -145,10 +146,12 @@ public class EstudianteController {
         estudiante.setDateOfBirth(request.getDateOfBirth());
         estudiante.setPhone(request.getPhone());
         estudiante.setGender(request.getGender());
-        estudiante.setSchoolClass(request.getSchoolClass());
-        estudiante.setEmergencyContactName(request.getEmergencyContactName());
-        estudiante.setEmergencyContactPhone(request.getEmergencyContactPhone());
-        estudiante.setSpecialNeeds(request.isSpecialNeeds());
+
+        estudiante.setClassroom(
+                classroomService.getClassroomById(
+                        request.getClassroomId()));
+
+        estudiante.setSpecial(request.isSpecial());
         estudiante.setMedicalInformation(request.getMedicalInformation());
 
         if (request.getAddress() != null) {
@@ -200,10 +203,12 @@ public class EstudianteController {
         estudiante.setDateOfBirth(request.getDateOfBirth());
         estudiante.setPhone(request.getPhone());
         estudiante.setGender(request.getGender());
-        estudiante.setSchoolClass(request.getSchoolClass());
-        estudiante.setEmergencyContactName(request.getEmergencyContactName());
-        estudiante.setEmergencyContactPhone(request.getEmergencyContactPhone());
-        estudiante.setSpecialNeeds(request.isSpecialNeeds());
+
+        estudiante.setClassroom(
+                classroomService.getClassroomById(
+                        request.getClassroomId()));
+
+        estudiante.setSpecial(request.isSpecial());
         estudiante.setMedicalInformation(request.getMedicalInformation());
 
         if (request.getAddress() != null) {
@@ -239,10 +244,10 @@ public class EstudianteController {
         response.setDateOfBirth(estudiante.getDateOfBirth());
         response.setPhone(estudiante.getPhone());
         response.setGender(estudiante.getGender());
-        response.setSchoolClass(estudiante.getSchoolClass());
-        response.setEmergencyContactName(estudiante.getEmergencyContactName());
-        response.setEmergencyContactPhone(estudiante.getEmergencyContactPhone());
-        response.setSpecialNeeds(estudiante.isSpecialNeeds());
+
+        response.setClassroomId(estudiante.getClassroom().getId());
+
+        response.setSpecial(estudiante.isSpecial());
         response.setMedicalInformation(estudiante.getMedicalInformation());
 
         if (estudiante.getAddress() != null) {

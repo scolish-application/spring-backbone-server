@@ -33,9 +33,12 @@ public class Classroom extends EntitySuperclass {
     private String description;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "discipline_id", nullable = false)
-    private Discipline discipline;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "classroom_disciplines",
+            joinColumns = @JoinColumn(name = "classroom_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "discipline_id", referencedColumnName = "id"))
+    private List<Discipline> disciplines;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -48,7 +51,7 @@ public class Classroom extends EntitySuperclass {
     @Column
     private String code;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "classroom_students",
             joinColumns = @JoinColumn(name = "classroom_id"),

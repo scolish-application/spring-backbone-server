@@ -14,7 +14,8 @@ import java.util.Optional;
 @Repository
 public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
 
-    List<Classroom> findByDiscipline(Discipline discipline);
+    @Query("SELECT c FROM Classroom c JOIN c.disciplines d WHERE d.id = :disciplineId")
+    List<Classroom> findByDisciplineId(@Param("disciplineId") final long disciplineId);
 
     List<Classroom> findBySemester(Semester semester);
 
@@ -25,13 +26,14 @@ public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
     @Query("SELECT c FROM Classroom c JOIN c.students s WHERE s.id = :studentId")
     List<Classroom> findClassroomsByStudentId(@Param("studentId") String studentId);
 
-    @Query("SELECT c FROM Classroom c JOIN FETCH c.discipline JOIN FETCH c.semester WHERE c.id = :id")
+    @Query("SELECT c FROM Classroom c JOIN FETCH c.disciplines JOIN FETCH c.semester WHERE c.id = :id")
     Optional<Classroom> findByIdWithDetails(@Param("id") long id);
 
     @Query("SELECT c FROM Classroom c WHERE c.name LIKE %:keyword% OR c.description LIKE %:keyword%")
     List<Classroom> searchClassroomsByKeyword(@Param("keyword") String keyword);
 
-    List<Classroom> findByDisciplineAndSemester(Discipline discipline, Semester semester);
+    @Query("SELECT c FROM Classroom c JOIN c.disciplines d JOIN c.semester s WHERE d = :discipline AND s = :semester")
+    List<Classroom> findByDisciplineAndSemester(@Param("discipline") Discipline discipline, @Param("semester") Semester semester);
 
     @Query("SELECT COUNT(s) FROM Classroom c JOIN c.students s WHERE c.id = :classroomId")
     Integer countStudentsInClassroom(@Param("classroomId") final long classroomId);
