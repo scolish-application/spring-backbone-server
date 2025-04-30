@@ -9,8 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.beans.Transient;
-
 @Component
 public class CreatePurseAfterUserRegistrationListener {
 

@@ -45,12 +45,7 @@ public class SecurityConfiguration {
                                 .requestMatchers("/api/authentication/register").permitAll()
                                 .requestMatchers("/api/authentication/login").permitAll()
                                 .requestMatchers("/api/authentication/hasAuthority/**").permitAll())
-                .authorizeHttpRequests((mail) ->
-                        mail
-                                .requestMatchers("/api/mail/**").authenticated())
-                .authorizeHttpRequests((users) ->
-                        users
-                                .requestMatchers("/api/user/**").permitAll())
+                .authorizeHttpRequests((api) -> api.requestMatchers("api/**").permitAll())
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(logout -> logout.deleteCookies("JSESSIONID"))
                 .authenticationProvider(authenticationProvider)
