@@ -85,13 +85,6 @@ public class ClassroomController {
         return ResponseEntity.ok(classroomFacade.updateClassroom(id, classroom));
     }
 
-    @GetMapping("/classrooms/discipline/{disciplineId}")
-    public ResponseEntity<List<Classroom>> getClassroomsByDiscipline(@PathVariable long disciplineId) {
-        Discipline discipline = new Discipline();
-        discipline.setId(disciplineId);
-        return ResponseEntity.ok(classroomFacade.getClassroomsByDiscipline(discipline));
-    }
-
     @GetMapping("/classrooms/semester/{semesterId}")
     public ResponseEntity<List<Classroom>> getClassroomsBySemester(@PathVariable long semesterId) {
         return classroomFacade.getSemester(semesterId)

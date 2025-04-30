@@ -3,7 +3,9 @@ package com.github.simaodiazz.schola.backbone.server.registry.data.service;
 import com.github.simaodiazz.schola.backbone.server.registry.data.model.Registration;
 import com.github.simaodiazz.schola.backbone.server.registry.data.model.RegistrationDirection;
 import com.github.simaodiazz.schola.backbone.server.registry.data.repository.RegistrationRepository;
+import com.github.simaodiazz.schola.backbone.server.registry.publisher.NotifyNewRegistrationPublisher;
 import com.github.simaodiazz.schola.backbone.server.security.data.model.User;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,16 +21,18 @@ import java.util.Optional;
 public class RegistrationService {
 
     private final RegistrationRepository registrationRepository;
+    private final NotifyNewRegistrationPublisher publisher;
 
-    @Autowired
-    public RegistrationService(RegistrationRepository registrationRepository) {
+    public RegistrationService(RegistrationRepository registrationRepository, NotifyNewRegistrationPublisher publisher) {
         this.registrationRepository = registrationRepository;
+        this.publisher = publisher;
     }
 
-    public Registration saveRegistration(Registration registration) {
+    public Registration saveRegistration(@NotNull Registration registration) {
         if (registration.getCreated() == null) {
             registration.setCreated(LocalDateTime.now());
         }
+        publisher.notification();
         return registrationRepository.save(registration);
     }
 

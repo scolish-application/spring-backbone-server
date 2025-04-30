@@ -9,6 +9,9 @@ import org.springframework.data.redis.cache.CacheKeyPrefix;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
@@ -36,5 +39,26 @@ public class RedisConfiguration {
         return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(factory)
                 .cacheDefaults(configuration)
                 .build();
+    }
+
+    @Bean
+    public MessageListenerAdapter messageListenerAdapter() {
+        return new MessageListenerAdapter();
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory redisConnectionFactory, MessageListenerAdapter messageListenerAdapter) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(redisConnectionFactory);
+
+        final ChannelTopic topic = new ChannelTopic("notifications:registration:new");
+        container.addMessageListener(messageListenerAdapter, topic);
+
+        return container;
+    }
+
+    @Bean
+    public ChannelTopic notificationsNewRegistrations() {
+        return new ChannelTopic("notifications:registrations:new");
     }
 }

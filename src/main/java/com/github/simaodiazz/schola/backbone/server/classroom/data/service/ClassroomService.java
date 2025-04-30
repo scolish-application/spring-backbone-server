@@ -58,10 +58,6 @@ public class ClassroomService {
         existingClassroom.setCapacity(updatedClassroom.getCapacity());
         existingClassroom.setType(updatedClassroom.getType());
 
-        if (updatedClassroom.getDisciplines() != null) {
-            existingClassroom.setDisciplines(updatedClassroom.getDisciplines());
-        }
-
         if (updatedClassroom.getSemester() != null) {
             existingClassroom.setSemester(updatedClassroom.getSemester());
         }
@@ -76,17 +72,6 @@ public class ClassroomService {
             throw new IllegalArgumentException("Classroom not found with id: " + id);
         }
         classroomRepository.deleteById(id);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Classroom> getClassroomsByDiscipline(Discipline discipline) {
-        return classroomRepository.findByDisciplineId(
-                discipline.getId());
-    }
-
-    @Transactional(readOnly = true)
-    public List<Classroom> getClassroomsByDiscipline(final long id) {
-        return classroomRepository.findByDisciplineId(id);
     }
 
     @Transactional(readOnly = true)
@@ -149,10 +134,6 @@ public class ClassroomService {
     private void validateClassroom(@NotNull Classroom classroom) {
         if (classroom.getName() == null || classroom.getName().trim().isEmpty()) {
             throw new IllegalArgumentException("Classroom name cannot be empty");
-        }
-
-        if (classroom.getDisciplines() == null || classroom.getDisciplines().isEmpty()) {
-            throw new IllegalArgumentException("Classroom must be associated with a discipline");
         }
 
         if (classroom.getSemester() == null) {

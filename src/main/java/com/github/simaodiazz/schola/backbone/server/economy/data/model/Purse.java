@@ -7,8 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.core.RedisHash;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
@@ -20,7 +22,7 @@ import java.util.List;
 public class Purse extends EntitySuperclass {
 
     @Column(nullable = false)
-    private double purse;
+    private double amount;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
@@ -33,4 +35,9 @@ public class Purse extends EntitySuperclass {
             inverseJoinColumns = @JoinColumn(name = "transaction_id", referencedColumnName = "id"))
     private List<Transaction> transactions;
 
+    public Purse(final @NotNull User user) {
+        this.user = user;
+        this.amount = 0;
+        this.transactions = new ArrayList<>();
+    }
 }

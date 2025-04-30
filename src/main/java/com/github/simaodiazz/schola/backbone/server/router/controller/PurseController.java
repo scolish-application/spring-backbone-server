@@ -82,12 +82,12 @@ public class PurseController {
         purse.getTransactions().add(transaction);
 
         if (transaction.getMovement() == com.github.simaodiazz.schola.backbone.server.economy.data.model.TransactionMovement.IN) {
-            purse.setPurse(purse.getPurse() + transaction.getAmount());
+            purse.setAmount(purse.getAmount() + transaction.getAmount());
         } else {
-            if (purse.getPurse() < transaction.getAmount()) {
+            if (purse.getAmount() < transaction.getAmount()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient funds");
             }
-            purse.setPurse(purse.getPurse() - transaction.getAmount());
+            purse.setAmount(purse.getAmount() - transaction.getAmount());
         }
 
         Purse updatedPurse = purseService.savePurse(purse);

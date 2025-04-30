@@ -66,10 +66,6 @@ public class ClassroomFacade {
         return classroomService.updateClassroom(id, classroom);
     }
 
-    public List<Classroom> getClassroomsByDiscipline(final @NotNull Discipline discipline) {
-        return classroomService.getClassroomsByDiscipline(discipline);
-    }
-
     public List<Classroom> getClassroomsBySemester(final @NotNull Semester semester) {
         return classroomService.getClassroomsBySemester(semester);
     }

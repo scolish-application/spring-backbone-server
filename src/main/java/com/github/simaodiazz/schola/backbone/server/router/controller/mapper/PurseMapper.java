@@ -38,7 +38,7 @@ public class PurseMapper {
 
         return new PurseRequest(
                 purse.getId(),
-                purse.getPurse(),
+                purse.getAmount(),
                 purse.getUser().getId(),
                 transactionDTOs
         );
@@ -53,7 +53,7 @@ public class PurseMapper {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + purseDTO.getUserId()));
 
         Purse purse = new Purse();
-        purse.setPurse(purseDTO.getPurse());
+        purse.setAmount(purseDTO.getPurse());
         purse.setUser(user);
         purse.setTransactions(new ArrayList<>());
 
@@ -65,7 +65,7 @@ public class PurseMapper {
             return;
         }
 
-        purse.setPurse(purseDTO.getPurse());
+        purse.setAmount(purseDTO.getPurse());
 
         if (!(purse.getUser().getId() == purseDTO.getUserId())) {
             User user = userService.id(purseDTO.getUserId())

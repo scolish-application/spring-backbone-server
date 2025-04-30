@@ -14,7 +14,6 @@ public class CreateCourierAfterUserRegistrationListener {
 
     private final @NotNull CourierService courierService;
 
-    @Autowired
     public CreateCourierAfterUserRegistrationListener(final @NotNull CourierService courierService) {
         this.courierService = courierService;
     }

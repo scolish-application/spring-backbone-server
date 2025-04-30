@@ -73,7 +73,7 @@ public class PurseControllerTest {
 
         purse = new Purse();
         purse.setId(1L);
-        purse.setPurse(1000.0);
+        purse.setAmount(1000.0);
         purse.setUser(user);
         purse.setTransactions(transactions);
 

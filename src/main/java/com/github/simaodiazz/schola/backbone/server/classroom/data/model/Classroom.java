@@ -1,9 +1,9 @@
 package com.github.simaodiazz.schola.backbone.server.classroom.data.model;
 
+import com.github.simaodiazz.schola.backbone.server.course.data.model.Course;
 import com.github.simaodiazz.schola.backbone.server.course.data.model.Discipline;
 import com.github.simaodiazz.schola.backbone.server.database.entity.EntitySuperclass;
 import com.github.simaodiazz.schola.backbone.server.entity.data.model.Estudiante;
-import com.github.simaodiazz.schola.backbone.server.entity.data.model.Teacher;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -31,14 +31,6 @@ public class Classroom extends EntitySuperclass {
 
     @Column(length = 1024)
     private String description;
-
-    @NotNull
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "classroom_disciplines",
-            joinColumns = @JoinColumn(name = "classroom_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "discipline_id", referencedColumnName = "id"))
-    private List<Discipline> disciplines;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -75,6 +67,11 @@ public class Classroom extends EntitySuperclass {
             inverseJoinColumns = @JoinColumn(name = "evaluation_id"))
     private List<Evaluation> evaluations = new ArrayList<>();
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(
+            name = "course_id", referencedColumnName = "id")
+    private Course course;
+
     @Column
     private String syllabus;
 
@@ -83,4 +80,5 @@ public class Classroom extends EntitySuperclass {
 
     @Column(nullable = false)
     private String type;
+
 }
