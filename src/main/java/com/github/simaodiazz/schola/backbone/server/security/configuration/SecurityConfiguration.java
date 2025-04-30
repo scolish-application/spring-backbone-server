@@ -13,7 +13,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
@@ -40,11 +39,6 @@ public class SecurityConfiguration {
         return security
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((auth) ->
-                        auth
-                                .requestMatchers("/api/authentication/register").permitAll()
-                                .requestMatchers("/api/authentication/login").permitAll()
-                                .requestMatchers("/api/authentication/hasAuthority/**").permitAll())
                 .authorizeHttpRequests((api) -> api.requestMatchers("api/**").permitAll())
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(logout -> logout.deleteCookies("JSESSIONID"))

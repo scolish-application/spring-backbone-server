@@ -3,7 +3,7 @@ package com.github.simaodiazz.schola.backbone.server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.simaodiazz.schola.backbone.server.economy.data.model.Purse;
 import com.github.simaodiazz.schola.backbone.server.economy.data.model.Transaction;
-import com.github.simaodiazz.schola.backbone.server.economy.data.model.TransactionMovement;
+import com.github.simaodiazz.schola.backbone.server.economy.data.model.TransactionDirection;
 import com.github.simaodiazz.schola.backbone.server.economy.data.service.PurseService;
 import com.github.simaodiazz.schola.backbone.server.router.controller.PurseController;
 import com.github.simaodiazz.schola.backbone.server.router.controller.dto.PurseCreateRequest;
@@ -85,13 +85,13 @@ public class PurseControllerTest {
         transaction.setLocation("Test Location");
         transaction.setCause("Test Cause");
         transaction.setAmount(100.0);
-        transaction.setMovement(TransactionMovement.IN);
+        transaction.setDirection(TransactionDirection.IN);
 
         transactionCreateRequest = new TransactionCreateRequest(
                 "Test Location",
                 "Test Cause",
                 100.0,
-                TransactionMovement.IN
+                TransactionDirection.IN
         );
     }
 
@@ -275,13 +275,13 @@ public class PurseControllerTest {
         outTransaction.setLocation("Test Location");
         outTransaction.setCause("Test Cause");
         outTransaction.setAmount(2000.0); // More than purse balance
-        outTransaction.setMovement(TransactionMovement.OUT);
+        outTransaction.setDirection(TransactionDirection.OUT);
 
         TransactionCreateRequest outRequest = new TransactionCreateRequest(
                 "Test Location",
                 "Test Cause",
                 2000.0,
-                TransactionMovement.OUT
+                TransactionDirection.OUT
         );
 
         when(transactionMapper.createRequest(any(TransactionCreateRequest.class))).thenReturn(outTransaction);

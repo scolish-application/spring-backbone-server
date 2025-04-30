@@ -1,10 +1,7 @@
 package com.github.simaodiazz.schola.backbone.server.economy.data.model;
 
 import com.github.simaodiazz.schola.backbone.server.database.entity.EntitySuperclass;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,6 +26,6 @@ public class Transaction extends EntitySuperclass {
     private double amount;
 
     @Enumerated(EnumType.STRING)
-    private TransactionMovement movement;
+    private TransactionDirection direction;
 
 }

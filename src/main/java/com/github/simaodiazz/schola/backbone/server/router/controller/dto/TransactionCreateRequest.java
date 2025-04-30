@@ -1,6 +1,6 @@
 package com.github.simaodiazz.schola.backbone.server.router.controller.dto;
 
-import com.github.simaodiazz.schola.backbone.server.economy.data.model.TransactionMovement;
+import com.github.simaodiazz.schola.backbone.server.economy.data.model.TransactionDirection;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,6 +23,6 @@ public class TransactionCreateRequest {
     private double amount;
 
     @NotNull(message = "Movement type is required")
-    private TransactionMovement movement;
+    private TransactionDirection movement;
 
 }

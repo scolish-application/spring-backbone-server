@@ -2,6 +2,7 @@ package com.github.simaodiazz.schola.backbone.server.router.controller;
 
 import com.github.simaodiazz.schola.backbone.server.economy.data.model.Purse;
 import com.github.simaodiazz.schola.backbone.server.economy.data.model.Transaction;
+import com.github.simaodiazz.schola.backbone.server.economy.data.model.TransactionDirection;
 import com.github.simaodiazz.schola.backbone.server.economy.data.service.PurseService;
 import com.github.simaodiazz.schola.backbone.server.router.controller.dto.PurseCreateRequest;
 import com.github.simaodiazz.schola.backbone.server.router.controller.dto.PurseRequest;
@@ -16,12 +17,15 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/purses")
 @Validated
 public class PurseController {
 
     private final PurseService purseService;
+
     private final PurseMapper purseMapper;
     private final TransactionMapper transactionMapper;
 
@@ -46,6 +50,13 @@ public class PurseController {
                 .map(purseMapper::request)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Purse not found for user ID: " + userId));
+    }
+
+    @GetMapping("/user/transactions/{id}")
+    public ResponseEntity<List<Transaction>> getTransitionsByUserId(@PathVariable(name = "id") long id) {
+        return purseService.getPurseByUserId(id)
+                .map(purse -> ResponseEntity.ok(purse.getTransactions()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Purse not found for user ID: " + id));
     }
 
     @PostMapping
@@ -81,7 +92,7 @@ public class PurseController {
         Transaction transaction = transactionMapper.createRequest(transactionCreateDTO);
         purse.getTransactions().add(transaction);
 
-        if (transaction.getMovement() == com.github.simaodiazz.schola.backbone.server.economy.data.model.TransactionMovement.IN) {
+        if (transaction.getDirection() == TransactionDirection.IN) {
             purse.setAmount(purse.getAmount() + transaction.getAmount());
         } else {
             if (purse.getAmount() < transaction.getAmount()) {
@@ -96,7 +107,7 @@ public class PurseController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePurse(@PathVariable Long id) {
-        if (!purseService.getPurseById(id).isPresent()) {
+        if (purseService.getPurseById(id).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Purse not found with ID: " + id);
         }
 

@@ -8,8 +8,10 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +49,23 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<?> me(@CookieValue(name = "SESSION", required = false) String session) {
+        if (session == null)
+            return ResponseEntity.badRequest().body("This cookie is invalid.");
+
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null)
+            return ResponseEntity.badRequest().body("You are not authenticated.");
+
+        final User user = (User) authentication.getPrincipal();
+        if (user == null)
+            return ResponseEntity.badRequest().body("User not found.");
+
+        final long id = user.getId();
+        return ResponseEntity.ok(id);
+    }
+
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@RequestBody @NotNull UserRequest userRequest) {
         try {
@@ -54,7 +73,6 @@ public class UserController {
             user.setUsername(userRequest.username());
             user.setPassword(passwordEncoder.encode(userRequest.password()));
 
-            // Convert string authorities to SimpleGrantedAuthority objects
             List<SimpleGrantedAuthority> authorities = userRequest.authorities().stream()
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
@@ -78,12 +96,10 @@ public class UserController {
             User user = optionalUser.get();
             user.setUsername(userRequest.username());
 
-            // Update password only if provided
             if (userRequest.password() != null && !userRequest.password().isEmpty()) {
                 user.setPassword(passwordEncoder.encode(userRequest.password()));
             }
 
-            // Update authorities if provided
             if (userRequest.authorities() != null && !userRequest.authorities().isEmpty()) {
                 List<SimpleGrantedAuthority> authorities = userRequest.authorities().stream()
                         .map(SimpleGrantedAuthority::new)

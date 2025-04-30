@@ -18,7 +18,7 @@ public class TransactionMapper {
                 transaction.getLocation(),
                 transaction.getCause(),
                 transaction.getAmount(),
-                transaction.getMovement()
+                transaction.getDirection()
         );
     }
 
@@ -31,7 +31,7 @@ public class TransactionMapper {
         transaction.setLocation(request.getLocation());
         transaction.setCause(request.getCause());
         transaction.setAmount(request.getAmount());
-        transaction.setMovement(request.getMovement());
+        transaction.setDirection(request.getMovement());
 
         return transaction;
     }
