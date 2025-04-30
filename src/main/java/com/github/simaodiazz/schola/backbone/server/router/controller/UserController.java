@@ -58,8 +58,6 @@ public class UserController {
         if (authentication == null)
             return ResponseEntity.badRequest().body("You are not authenticated.");
 
-        System.out.println(authentication.getPrincipal());
-
         final User user = (User) authentication.getPrincipal();
         if (user == null)
             return ResponseEntity.badRequest().body("User not found.");
