@@ -22,7 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/registration")
+@RequestMapping("/api/registrations")
 @Validated
 public class RegistrationController {
 
