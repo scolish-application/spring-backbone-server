@@ -13,5 +13,5 @@ public class TransactionRequest {
     private String location;
     private String cause;
     private double amount;
-    private TransactionDirection movement;
+    private TransactionDirection direction;
 }

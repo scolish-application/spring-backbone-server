@@ -1,6 +1,7 @@
 package com.github.simaodiazz.schola.backbone.server.router.controller;
 
 import com.github.simaodiazz.schola.backbone.server.router.controller.dto.AuthenticationRequest;
+import com.github.simaodiazz.schola.backbone.server.router.controller.dto.UserResponse;
 import com.github.simaodiazz.schola.backbone.server.router.event.AuthenticationRegisterRouteInvokeEvent;
 import com.github.simaodiazz.schola.backbone.server.security.data.model.User;
 import com.github.simaodiazz.schola.backbone.server.security.data.model.builder.UserBuilder;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -35,7 +37,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @NotNull AuthenticationRequest authRequest,
+    public ResponseEntity<?> login(@RequestBody @NotNull AuthenticationRequest authRequest,
                                         HttpServletRequest request) {
         try {
             UsernamePasswordAuthenticationToken token =
@@ -50,7 +52,13 @@ public class AuthenticationController {
             HttpSession session = request.getSession(true);
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
 
-            return ResponseEntity.ok("Login successful.");
+            User user = userDataService.username(
+                    authRequest.username()).orElse(null);
+
+            if (user == null)
+                return ResponseEntity.badRequest().build();
+
+            return ResponseEntity.ok(new UserResponse(user.getId(), authRequest.username(), user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList()));
         } catch (Exception exception) {
             return ResponseEntity.badRequest().body(exception.getMessage());
         }

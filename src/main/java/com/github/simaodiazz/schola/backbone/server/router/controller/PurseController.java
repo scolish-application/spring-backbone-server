@@ -45,11 +45,11 @@ public class PurseController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<PurseRequest> getPurseByUserId(@PathVariable Long userId) {
+    public ResponseEntity<PurseRequest> getPurseByUserId(@PathVariable long userId) {
         return purseService.getPurseByUserId(userId)
                 .map(purseMapper::request)
                 .map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Purse not found for user ID: " + userId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Purse not found with ID: " + userId));
     }
 
     @GetMapping("/user/transactions/{id}")
@@ -57,17 +57,6 @@ public class PurseController {
         return purseService.getPurseByUserId(id)
                 .map(purse -> ResponseEntity.ok(purse.getTransactions()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Purse not found for user ID: " + id));
-    }
-
-    @PostMapping
-    public ResponseEntity<PurseRequest> createPurse(@Valid @RequestBody PurseCreateRequest purseCreateDTO) {
-        try {
-            Purse purseEntity = purseMapper.createRequest(purseCreateDTO);
-            Purse savedPurse = purseService.savePurse(purseEntity);
-            return ResponseEntity.status(HttpStatus.CREATED).body(purseMapper.request(savedPurse));
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
     }
 
     @PutMapping("/{id}")

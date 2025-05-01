@@ -23,6 +23,6 @@ public class TransactionCreateRequest {
     private double amount;
 
     @NotNull(message = "Movement type is required")
-    private TransactionDirection movement;
+    private TransactionDirection direction;
 
 }

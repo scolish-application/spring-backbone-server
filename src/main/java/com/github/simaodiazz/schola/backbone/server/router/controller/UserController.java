@@ -3,6 +3,7 @@ package com.github.simaodiazz.schola.backbone.server.router.controller;
 import com.github.simaodiazz.schola.backbone.server.router.controller.dto.UserRequest;
 import com.github.simaodiazz.schola.backbone.server.router.controller.dto.UserResponse;
 import com.github.simaodiazz.schola.backbone.server.security.data.model.User;
+import com.github.simaodiazz.schola.backbone.server.security.data.repository.UserRepository;
 import com.github.simaodiazz.schola.backbone.server.security.service.UserDataService;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -44,6 +45,14 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable long id) {
         return userDataService.id(id)
+                .map(this::mapToUserResponse)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/name/{username}")
+    public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username) {
+        return userDataService.username(username)
                 .map(this::mapToUserResponse)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
