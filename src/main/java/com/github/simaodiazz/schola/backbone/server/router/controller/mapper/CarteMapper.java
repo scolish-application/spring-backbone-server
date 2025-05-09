@@ -1,6 +1,7 @@
 package com.github.simaodiazz.schola.backbone.server.router.controller.mapper;
 
 import com.github.simaodiazz.schola.backbone.server.registry.data.model.Carte;
+import com.github.simaodiazz.schola.backbone.server.router.controller.dto.CarteCreateRequest;
 import com.github.simaodiazz.schola.backbone.server.router.controller.dto.CarteRequest;
 import com.github.simaodiazz.schola.backbone.server.security.service.UserDataService;
 import org.jetbrains.annotations.NotNull;

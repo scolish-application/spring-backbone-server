@@ -4,10 +4,12 @@ import com.github.simaodiazz.schola.backbone.server.registry.data.model.Carte;
 import com.github.simaodiazz.schola.backbone.server.registry.data.model.Registration;
 import com.github.simaodiazz.schola.backbone.server.registry.data.service.CarteService;
 import com.github.simaodiazz.schola.backbone.server.registry.data.service.RegistrationService;
+import com.github.simaodiazz.schola.backbone.server.router.controller.dto.CarteCreateRequest;
 import com.github.simaodiazz.schola.backbone.server.router.controller.dto.CarteRequest;
 import com.github.simaodiazz.schola.backbone.server.router.controller.dto.RegistrationRequest;
 import com.github.simaodiazz.schola.backbone.server.router.controller.mapper.CarteMapper;
 import com.github.simaodiazz.schola.backbone.server.router.controller.mapper.RegistrationMapper;
+import com.github.simaodiazz.schola.backbone.server.security.service.UserDataService;
 import jakarta.validation.Valid;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,17 +28,14 @@ import java.util.List;
 @Validated
 public class RegistrationController {
 
+    private final UserDataService service;
     private final RegistrationService registrationService;
     private final CarteService carteService;
     private final RegistrationMapper registrationMapper;
     private final CarteMapper carteMapper;
 
-    @Autowired
-    public RegistrationController(
-            RegistrationService registrationService,
-            CarteService carteService,
-            RegistrationMapper registrationMapper,
-            CarteMapper carteMapper) {
+    public RegistrationController(UserDataService service, RegistrationService registrationService, CarteService carteService, RegistrationMapper registrationMapper, CarteMapper carteMapper) {
+        this.service = service;
         this.registrationService = registrationService;
         this.carteService = carteService;
         this.registrationMapper = registrationMapper;
@@ -87,12 +86,12 @@ public class RegistrationController {
     }
 
     @PostMapping("/carte")
-    public ResponseEntity<CarteRequest> createCarte(@Valid @RequestBody @NotNull CarteRequest carteDTO) {
+    public ResponseEntity<CarteRequest> createCarte(@Valid @RequestBody @NotNull CarteCreateRequest carteDTO) {
         if (carteService.existsByCode(carteDTO.getCode())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Carte already exists with code: " + carteDTO.getCode());
         }
 
-        Carte carte = carteMapper.toEntity(carteDTO);
+        Carte carte = new Carte(carteDTO.getCode(), carteDTO.getColor(), service.id(carteDTO.getUserId()).orElse(null));
         Carte savedCarte = carteService.saveCarte(carte);
         return ResponseEntity.status(HttpStatus.CREATED).body(carteMapper.toRequest(savedCarte));
     }
